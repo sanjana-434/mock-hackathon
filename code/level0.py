@@ -61,6 +61,7 @@ f.close()
 path_ = ['r0']
 for i in path:
     path_.append('n'+str(i-1))
+path_.pop()
 path_.append('r0')
 print(path_)
 dictionary = {"v0": {"path": path_}}

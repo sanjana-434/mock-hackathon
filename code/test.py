@@ -1,33 +1,55 @@
+from sys import maxsize 
+from itertools import permutations
+import json
 import numpy as np
-def travellingsalesman(c):
-    global cost
-    adj_vertex = 99999
-    min_val = 99999
-    visited[c] = 1
-    print((c + 1), end=" ")
-    for k in range(n):
-        if (tsp_g[c][k] != 0) and (visited[k] == 0):
-            if tsp_g[c][k] < min_val:
-                min_val = tsp_g[c][k]
-                adj_vertex = k
-    if min_val != 99999:
-        cost = cost + min_val
-    if adj_vertex == 99999:
-        adj_vertex = 0
-        print((adj_vertex + 1), end=" ")
-        cost = cost + tsp_g[c][adj_vertex]
-        return
-    travellingsalesman(adj_vertex)
-n = 20
-cost = 0
-visited = np.zeros(n, dtype=int)
-tsp_g = np.array([[12, 30, 33, 10, 45],
-                  [56, 22, 9, 15, 18],
-                  [29, 13, 8, 5, 12],
-                  [33, 28, 16, 10, 3],
-                  [1, 4, 30, 24, 20]])
-print("Shortest Path:", end=" ")
-travellingsalesman(0)
-print()
-print("Minimum Cost:", end=" ")
-print(cost)
+ 
+f = open('C:/work-shop/Inputdata/level1a.json')
+ 
+
+data = json.load(f)
+
+n = data['n_neighbourhoods']
+
+dist = []
+dist.append([0])
+res = data['restaurants']['r0']['neighbourhood_distance']
+dist[0].extend(res)
+for i in range(0,n):
+    dist.append([res[i]])
+    dist[i+1].extend(data['neighbourhoods']['n'+str(i)]['distances'])
+
+V = n
+ 
+# implementation of traveling Salesman Problem 
+def travellingSalesmanProblem(graph, s): 
+    # store all vertex apart from source vertex 
+    vertex = [] 
+    for i in range(V): 
+        if i != s: 
+            vertex.append(i) 
+ 
+    # store minimum weight Hamiltonian Cycle 
+    min_path = maxsize 
+    next_permutation=permutations(vertex)
+    for i in next_permutation:
+ 
+        # store current Path weight(cost) 
+        current_pathweight = 0
+ 
+        # compute current path weight 
+        k = s 
+        for j in i: 
+            current_pathweight += graph[k][j] 
+            k = j 
+        current_pathweight += graph[k][s] 
+ 
+        # update minimum 
+        min_path = min(min_path, current_pathweight) 
+         
+    return min_path 
+ 
+ 
+
+graph = dist
+s = 0
+print(travellingSalesmanProblem(graph, s))
