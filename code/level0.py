@@ -18,7 +18,7 @@ for i in range(0,n):
     dist.append([res[i]])
     dist[i+1].extend(data['neighbourhoods']['n'+str(i)]['distances'])
 
-
+n+=1
 for i in dist:
     print(i)
 
@@ -51,6 +51,8 @@ travellingsalesman(0)
 print(path)
 print("Minimum Cost:", end=" ")
 print(cost)
+for i in range(0,len(path)):
+    path[i]-=1
 
 f.close()
 
@@ -58,10 +60,10 @@ f.close()
  
 # Data to be written
 # dictionary = {"v0": {"path": ["r0", "n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "r0"]}}
-path_ = ['r0']
-for i in path:
-    path_.append('n'+str(i-1))
-path_.pop()
+path_ = []
+path_.append('r0')
+for i in range(1,len(path)-1):
+    path_.append('n'+str(path[i]-1))
 path_.append('r0')
 print(path_)
 dictionary = {"v0": {"path": path_}}
