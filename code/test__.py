@@ -1,54 +1,58 @@
 import numpy as np
-import json
-import sys
- 
-f = open('C:/work-shop/Inputdata/level0.json')
- 
+from tsp_solver import solve_tsp  # Assuming a TSP solver is available
 
-data = json.load(f)
+def find_delivery_paths(adjacency_matrix, order_capacities, total_capacity):
+    num_locations = len(adjacency_matrix)
 
-n = data['n_neighbourhoods']
+    # Initialize variables
+    paths = []
+    current_path = [0]  # Start at the depot (index 0)
+    current_capacity = 0
 
-dist = []
-dist.append([0])
-res = data['restaurants']['r0']['neighbourhood_distance']
-dist[0].extend(res)
-for i in range(0,n):
-    dist.append([res[i]])
-    dist[i+1].extend(data['neighbourhoods']['n'+str(i)]['distances'])
+    while len(current_path) > 0:
+        # Find the next feasible location to visit
+        next_location = find_next_location(
+            adjacency_matrix, current_path, order_capacities, total_capacity, current_capacity
+        )
 
-def nearest_neighbor_algorithm(adjacency_matrix):
-    n = len(adjacency_matrix)
-    visited = [False] * n
-    tour = [0]  # Start from the first city
+        if next_location is not None:
+            # Add the location to the current path
+            current_path.append(next_location)
+            current_capacity += order_capacities[next_location]
 
-    for _ in range(1, n):
-        current_city = tour[-1]
-        min_distance = float('inf')
-        nearest_city = None
+            # If the path is full, solve the TSP for this path and store it
+            if current_capacity == total_capacity:
+                path_indices = solve_tsp(adjacency_matrix[current_path, :][:, current_path])
+                paths.append([current_path[i] for i in path_indices])
+                current_path = [0]  # Start a new path from the depot
+                current_capacity = 0
+        else:
+            # Remove the last location from the current path (backtrack)
+            current_path.pop()
+            current_capacity -= order_capacities[current_path[-1]]
 
-        for i in range(n):
-            if not visited[i] and i != current_city and adjacency_matrix[current_city][i] < min_distance:
-                min_distance = adjacency_matrix[current_city][i]
-                nearest_city = i
+    return paths
 
-        tour.append(nearest_city)
-        visited[nearest_city] = True
+def find_next_location(adjacency_matrix, current_path, order_capacities, total_capacity, current_capacity):
+    feasible_locations = []
+    for i in range(1, len(adjacency_matrix)):
+        if i not in current_path and current_capacity + order_capacities[i] <= total_capacity:
+            feasible_locations.append(i)
 
-    tour.append(tour[0])  # Return to the starting city to complete the tour
-    total_distance = sum(adjacency_matrix[tour[i]][tour[i + 1]] for i in range(n))
+    if feasible_locations:
+        # Choose the closest feasible location based on distance
+        closest_location = min(feasible_locations, key=lambda i: adjacency_matrix[current_path[-1], i])
+        return closest_location
+    else:
+        return None
 
-    return tour, total_distance
+# Example usage
+adjacency_matrix = np.array([[0, 10, 25, 15],
+                             [10, 0, 30, 20],
+                             [25, 30, 0, 35],
+                             [15, 20, 35, 0]])
+order_capacities = [0, 5, 8, 12]
+total_capacity = 15
 
-if __name__ == "__main__":
-    # Example: Adjacency matrix representing distances between cities
-    adjacency_matrix = np.array(dist)
-
-    # Applying the Nearest Neighbor Algorithm
-    tour, total_distance = nearest_neighbor_algorithm(adjacency_matrix)
-
-    # Output the result with the shortest path
-    print(tour)
-
-    print("Shortest Path:", path_str)
-    print("Total Distance:", total_distance)
+paths = find_delivery_paths(adjacency_matrix, order_capacities, total_capacity)
+print(paths)  # Output: [[0, 1, 0, 2, 0], [0, 3]]

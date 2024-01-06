@@ -3,7 +3,7 @@
 import json
 import numpy as np
  
-f = open('C:/work-shop/Inputdata/level1b.json')
+f = open('C:/work-shop/Inputdata/level2a.json')
  
 
 data = json.load(f)
@@ -27,8 +27,12 @@ for i in range(0,n):
 # print(order_quantity)
 # print(sum(order_quantity))
 
-capacities = data['vehicles']['v0']['capacity']
-# print(capacity)
+capacities = []
+for i in range(0,len(data['vehicles'])):
+    capacities.append(data['vehicles']['v'+str(i)]['capacity'])
+print("999999999999999999999")
+print(capacities)
+
 
 
 def greedy(node,graph,order,cap,vis,c,path,index,ans):
@@ -47,6 +51,7 @@ def greedy(node,graph,order,cap,vis,c,path,index,ans):
         flag = 0
         for key, value in dict_.items():
             if (key!=value):
+                print(cap)
                 if (vis[value-1]==0 and c+order[value-1] <= cap):
                     flag = 1
                     vis[value-1] = 1
@@ -71,8 +76,12 @@ for i in range(0,len(order_quantity)):
     total_vis.append(0)
 
 final_answer = []
+k = 0
 while(len(adjacency_matrix) != 1):
-    path,ans = greedy(0,adjacency_matrix,order_quantity,capacities,vis,0,[],index,[0,])
+    path,ans = greedy(0,adjacency_matrix,order_quantity,capacities[k],vis,0,[],index,[0,])
+    k+=1
+    if (k >= len(capacities)):
+        k = 0
     print(path,ans)
     for i in ans:
         if (i!=0):
@@ -107,5 +116,5 @@ print(dictionary)
 json_object = json.dumps(dictionary, indent=4)
  
 
-with open("C:/work-shop/output/level1b_output.json", "w") as outfile:
+with open("C:/work-shop/output/level2a_output.json", "w") as outfile:
     outfile.write(json_object)
