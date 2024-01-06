@@ -1,21 +1,3 @@
-# code by Sanjana R (21pd31)
-
-import json
-import numpy as np
- 
-f = open('C:/work-shop/Inputdata/level0.json')
- 
-
-data = json.load(f)
-
-# n = data['n_neighbourhoods']
-n = 10
-dist = []
-for i in range(0,10):
-    dist.append(data['neighbourhoods']['n'+str(i)]['distances'][0:10])
-
-for i in dist:
-    print(i)
 import numpy as np
 def travellingsalesman(c):
     global cost
@@ -36,14 +18,16 @@ def travellingsalesman(c):
         cost = cost + tsp_g[c][adj_vertex]
         return
     travellingsalesman(adj_vertex)
+n = 20
 cost = 0
 visited = np.zeros(n, dtype=int)
-tsp_g = np.array(dist)
+tsp_g = np.array([[12, 30, 33, 10, 45],
+                  [56, 22, 9, 15, 18],
+                  [29, 13, 8, 5, 12],
+                  [33, 28, 16, 10, 3],
+                  [1, 4, 30, 24, 20]])
 print("Shortest Path:", end=" ")
 travellingsalesman(0)
 print()
 print("Minimum Cost:", end=" ")
 print(cost)
-
-
-f.close()
