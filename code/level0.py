@@ -11,11 +11,16 @@ data = json.load(f)
 n = data['n_neighbourhoods']
 
 dist = []
+dist.append([0])
+res = data['restaurants']['r0']['neighbourhood_distance']
+dist[0].extend(res)
 for i in range(0,n):
-    dist.append(data['neighbourhoods']['n'+str(i)]['distances'])
+    dist.append([res[i]])
+    dist[i+1].extend(data['neighbourhoods']['n'+str(i)]['distances'])
 
-# for i in dist:
-#     print(i)
+
+for i in dist:
+    print(i)
 
 
 path = []
@@ -53,11 +58,10 @@ f.close()
  
 # Data to be written
 # dictionary = {"v0": {"path": ["r0", "n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "r0"]}}
-path_ = ['r'+str(path[0]-1)]
+path_ = ['r0']
 for i in path:
     path_.append('n'+str(i-1))
-
-path_[-1]= 'r'+str(path[0]-1)
+path_.append('r0')
 print(path_)
 dictionary = {"v0": {"path": path_}}
 print(dictionary)
